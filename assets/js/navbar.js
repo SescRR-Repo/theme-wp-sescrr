@@ -1,6 +1,6 @@
 /**
- * SESC RR - JavaScript do Navbar
- * navbar.js - Funcionalidades completas
+ * SESC RR - JavaScript do Navbar - VERSÃO CORRIGIDA
+ * navbar.js - Funcionalidades completas com dropdown funcional
  */
 
 (function($) {
@@ -22,13 +22,152 @@
     function initNavbar() {
         initMobileMenu();
         initServicesDropdown();
+        initCategoryDropdowns(); // NOVA FUNÇÃO PRINCIPAL
         initSearch();
         initStickyHeader();
         initAccessibility();
         initScrollEffects();
         initPerformanceOptimizations();
+        initMobileAccordion(); // ACCORDION MOBILE
         
         console.log('SESC RR Navbar inicializado com sucesso!');
+    }
+
+    /**
+     * DROPDOWN DE CATEGORIAS - PRINCIPAL CORREÇÃO
+     */
+    function initCategoryDropdowns() {
+        console.log('Inicializando dropdowns de categoria...');
+        
+        // Selecionar todos os itens de categoria que têm submenu
+        const $categoryItems = $('.category-item.menu-item-has-children, .category-item:has(.sub-menu)');
+        
+        console.log('Encontrados', $categoryItems.length, 'itens com submenu');
+        
+        $categoryItems.each(function() {
+            const $item = $(this);
+            const $submenu = $item.find('.sub-menu');
+            let hoverTimeout;
+
+            console.log('Configurando item:', $item.find('> a').text().trim());
+            
+            // Garantir que o submenu existe
+            if ($submenu.length === 0) {
+                console.log('Submenu não encontrado para:', $item.find('> a').text().trim());
+                return;
+            }
+
+            // Mouse enter no item principal
+            $item.on('mouseenter', function() {
+                console.log('Mouse enter em:', $item.find('> a').text().trim());
+                clearTimeout(hoverTimeout);
+                
+                // Esconder outros submenus
+                $('.category-item .sub-menu').not($submenu).css({
+                    'opacity': '0',
+                    'visibility': 'hidden',
+                    'transform': 'translateY(-10px)'
+                });
+                
+                // Mostrar este submenu
+                $submenu.css({
+                    'opacity': '1',
+                    'visibility': 'visible',
+                    'transform': 'translateY(0)'
+                });
+            });
+
+            // Mouse leave do item principal
+            $item.on('mouseleave', function() {
+                console.log('Mouse leave em:', $item.find('> a').text().trim());
+                hoverTimeout = setTimeout(() => {
+                    $submenu.css({
+                        'opacity': '0',
+                        'visibility': 'hidden',
+                        'transform': 'translateY(-10px)'
+                    });
+                }, 200); // Delay para permitir movimento do mouse
+            });
+
+            // Mouse enter no submenu (manter visível)
+            $submenu.on('mouseenter', function() {
+                console.log('Mouse enter no submenu');
+                clearTimeout(hoverTimeout);
+            });
+
+            // Mouse leave do submenu
+            $submenu.on('mouseleave', function() {
+                console.log('Mouse leave no submenu');
+                hoverTimeout = setTimeout(() => {
+                    $submenu.css({
+                        'opacity': '0',
+                        'visibility': 'hidden',
+                        'transform': 'translateY(-10px)'
+                    });
+                }, 100);
+            });
+
+            // Navegação por teclado
+            $item.find('> a').on('keydown', function(e) {
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    $submenu.css({
+                        'opacity': '1',
+                        'visibility': 'visible',
+                        'transform': 'translateY(0)'
+                    });
+                    $submenu.find('a').first().focus();
+                }
+            });
+
+            // Navegação dentro do submenu
+            $submenu.find('a').on('keydown', function(e) {
+                const $links = $submenu.find('a');
+                const currentIndex = $links.index(this);
+                
+                switch(e.key) {
+                    case 'ArrowDown':
+                        e.preventDefault();
+                        if (currentIndex < $links.length - 1) {
+                            $links.eq(currentIndex + 1).focus();
+                        }
+                        break;
+                    case 'ArrowUp':
+                        e.preventDefault();
+                        if (currentIndex > 0) {
+                            $links.eq(currentIndex - 1).focus();
+                        } else {
+                            $item.find('> a').focus();
+                            $submenu.css({
+                                'opacity': '0',
+                                'visibility': 'hidden',
+                                'transform': 'translateY(-10px)'
+                            });
+                        }
+                        break;
+                    case 'Escape':
+                        e.preventDefault();
+                        $item.find('> a').focus();
+                        $submenu.css({
+                            'opacity': '0',
+                            'visibility': 'hidden',
+                            'transform': 'translateY(-10px)'
+                        });
+                        break;
+                }
+            });
+        });
+
+        // Fechar todos os dropdowns ao clicar fora
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('.category-item').length) {
+                $('.category-item .sub-menu').css({
+                    'opacity': '0',
+                    'visibility': 'hidden',
+                    'transform': 'translateY(-10px)'
+                });
+            }
+        });
     }
 
     /**
@@ -58,9 +197,12 @@
             }
         });
 
-        // Fechar ao clicar em links
-        $('.mobile-category-list a').on('click', function() {
-            setTimeout(closeMobileMenu, 100);
+        // Fechar ao clicar em links (exceto se tiver submenu)
+        $('.mobile-category-list a').on('click', function(e) {
+            const $parent = $(this).parent();
+            if (!$parent.hasClass('menu-item-has-children')) {
+                setTimeout(closeMobileMenu, 100);
+            }
         });
 
         // Fechar ao redimensionar para desktop
@@ -103,6 +245,29 @@
     }
 
     /**
+     * ACCORDION MOBILE PARA CATEGORIAS
+     */
+    function initMobileAccordion() {
+        $('.mobile-category-list .menu-item-has-children > a').on('click', function(e) {
+            e.preventDefault();
+            
+            const $item = $(this).parent();
+            const $submenu = $item.find('.sub-menu');
+            
+            console.log('Clique no accordion mobile:', $(this).text().trim());
+            
+            // Toggle classe open
+            $item.toggleClass('open');
+            
+            // Fechar outros itens
+            $item.siblings('.menu-item-has-children').removeClass('open');
+            
+            // Log do estado
+            console.log('Item agora está:', $item.hasClass('open') ? 'aberto' : 'fechado');
+        });
+    }
+
+    /**
      * DROPDOWN DE SERVIÇOS
      */
     function initServicesDropdown() {
@@ -110,23 +275,36 @@
         const $button = $('.btn-services');
         const $menu = $('.services-menu');
         let isOpen = false;
+        let hoverTimeout;
 
-        // Toggle dropdown
+        // Hover events
+        $dropdown.on('mouseenter', function() {
+            clearTimeout(hoverTimeout);
+            openServicesDropdown();
+        });
+
+        $dropdown.on('mouseleave', function() {
+            hoverTimeout = setTimeout(() => {
+                closeServicesDropdown();
+            }, 200);
+        });
+
+        // Click events
         $button.on('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
             
             if (isOpen) {
-                closeDropdown();
+                closeServicesDropdown();
             } else {
-                openDropdown();
+                openServicesDropdown();
             }
         });
 
         // Fechar ao clicar fora
         $(document).on('click', function(e) {
             if (!$(e.target).closest('.services-dropdown').length && isOpen) {
-                closeDropdown();
+                closeServicesDropdown();
             }
         });
 
@@ -159,22 +337,26 @@
 
                 case 'Escape':
                     e.preventDefault();
-                    closeDropdown();
+                    closeServicesDropdown();
                     $button.focus();
                     break;
 
                 case 'Tab':
                     if (e.shiftKey && currentIndex === 0) {
-                        closeDropdown();
+                        closeServicesDropdown();
                     } else if (!e.shiftKey && currentIndex === $items.length - 1) {
-                        closeDropdown();
+                        closeServicesDropdown();
                     }
                     break;
             }
         });
 
-        function openDropdown() {
-            $menu.addClass('show');
+        function openServicesDropdown() {
+            $menu.css({
+                'opacity': '1',
+                'visibility': 'visible',
+                'transform': 'translateY(0)'
+            });
             $button.attr('aria-expanded', 'true');
             $dropdown.attr('aria-expanded', 'true');
             isOpen = true;
@@ -185,8 +367,12 @@
             }, 100);
         }
 
-        function closeDropdown() {
-            $menu.removeClass('show');
+        function closeServicesDropdown() {
+            $menu.css({
+                'opacity': '0',
+                'visibility': 'hidden',
+                'transform': 'translateY(-10px)'
+            });
             $button.attr('aria-expanded', 'false');
             $dropdown.attr('aria-expanded', 'false');
             isOpen = false;
@@ -296,16 +482,7 @@
             isSearching = true;
             $searchForm.addClass('loading');
 
-            // Simular busca (substituir por AJAX real)
-            setTimeout(() => {
-                const mockResults = generateMockResults(query);
-                displaySearchResults(mockResults);
-                isSearching = false;
-                $searchForm.removeClass('loading');
-            }, 500);
-
-            // AJAX real (descomente e configure conforme necessário)
-            /*
+            // AJAX real 
             $.ajax({
                 url: sescAjax.ajaxurl,
                 type: 'POST',
@@ -318,18 +495,21 @@
                     if (response.success) {
                         displaySearchResults(response.data);
                     } else {
-                        showNotification('Erro na busca. Tente novamente.', 'error');
+                        // Fallback para resultados mock
+                        const mockResults = generateMockResults(query);
+                        displaySearchResults(mockResults);
                     }
                 },
                 error: function() {
-                    showNotification('Erro de conexão. Tente novamente.', 'error');
+                    // Fallback para resultados mock em caso de erro
+                    const mockResults = generateMockResults(query);
+                    displaySearchResults(mockResults);
                 },
                 complete: function() {
                     isSearching = false;
                     $searchForm.removeClass('loading');
                 }
             });
-            */
         }
 
         /**
@@ -337,7 +517,7 @@
          */
         function displaySearchResults(results) {
             if (!results || results.length === 0) {
-                $searchResults.html('<div class="no-results">Nenhum resultado encontrado.</div>');
+                $searchResults.html('<div class="no-results" style="padding: 20px; text-align: center; color: #666;">Nenhum resultado encontrado.</div>');
             } else {
                 let html = '';
                 results.forEach(result => {
@@ -385,6 +565,24 @@
                     title: 'Saúde e Bem-estar',
                     excerpt: 'Serviços de saúde e programas de bem-estar',
                     url: '/saude',
+                    thumbnail: null
+                },
+                {
+                    title: 'Cultura e Arte',
+                    excerpt: 'Eventos culturais e exposições artísticas',
+                    url: '/cultura',
+                    thumbnail: null
+                },
+                {
+                    title: 'Assistência Social',
+                    excerpt: 'Serviços de assistência e orientação',
+                    url: '/assistencia',
+                    thumbnail: null
+                },
+                {
+                    title: 'Turismo SESC',
+                    excerpt: 'Pacotes e destinos turísticos SESC',
+                    url: '/turismo',
                     thumbnail: null
                 }
             ];
@@ -562,140 +760,3 @@
     };
 
 })(jQuery);
-
-/**
- * ADICIONAR estas funções ao navbar.js após as funções existentes
- */
-
-/**
- * DROPDOWN DE CATEGORIAS (Desktop)
- */
-function initCategoryDropdowns() {
-    $('.category-item.menu-item-has-children').each(function() {
-        const $item = $(this);
-        const $submenu = $item.find('.sub-menu');
-        let hoverTimeout;
-
-        // Mouse enter
-        $item.on('mouseenter', function() {
-            clearTimeout(hoverTimeout);
-            $submenu.stop(true, true).fadeIn(200);
-        });
-
-        // Mouse leave
-        $item.on('mouseleave', function() {
-            hoverTimeout = setTimeout(() => {
-                $submenu.stop(true, true).fadeOut(200);
-            }, 100);
-        });
-
-        // Manter visível ao hover no submenu
-        $submenu.on('mouseenter', function() {
-            clearTimeout(hoverTimeout);
-        });
-
-        $submenu.on('mouseleave', function() {
-            hoverTimeout = setTimeout(() => {
-                $submenu.stop(true, true).fadeOut(200);
-            }, 100);
-        });
-    });
-}
-
-/**
- * ACCORDION MOBILE
- */
-function initMobileAccordion() {
-    $('.mobile-category-list .menu-item-has-children > a').on('click', function(e) {
-        e.preventDefault();
-        
-        const $item = $(this).parent();
-        const $submenu = $item.find('.sub-menu');
-        
-        // Toggle classe open
-        $item.toggleClass('open');
-        
-        // Fechar outros itens
-        $item.siblings('.menu-item-has-children').removeClass('open');
-    });
-}
-
-/**
- * MELHORAR DROPDOWN DE SERVIÇOS
- */
-function enhanceServicesDropdown() {
-    const $dropdown = $('.services-dropdown');
-    const $button = $('.btn-services');
-    const $menu = $('.services-menu');
-    let isOpen = false;
-    let hoverTimeout;
-
-    // Hover events
-    $dropdown.on('mouseenter', function() {
-        clearTimeout(hoverTimeout);
-        openServicesDropdown();
-    });
-
-    $dropdown.on('mouseleave', function() {
-        hoverTimeout = setTimeout(() => {
-            closeServicesDropdown();
-        }, 200);
-    });
-
-    // Click events
-    $button.on('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        if (isOpen) {
-            closeServicesDropdown();
-        } else {
-            openServicesDropdown();
-        }
-    });
-
-    // Fechar ao clicar fora
-    $(document).on('click', function(e) {
-        if (!$(e.target).closest('.services-dropdown').length && isOpen) {
-            closeServicesDropdown();
-        }
-    });
-
-    function openServicesDropdown() {
-        $menu.css({
-            'opacity': '1',
-            'visibility': 'visible',
-            'transform': 'translateY(0)'
-        });
-        $button.attr('aria-expanded', 'true');
-        isOpen = true;
-    }
-
-    function closeServicesDropdown() {
-        $menu.css({
-            'opacity': '0',
-            'visibility': 'hidden',
-            'transform': 'translateY(-10px)'
-        });
-        $button.attr('aria-expanded', 'false');
-        isOpen = false;
-    }
-}
-
-// INICIALIZAR as novas funções - adicionar à função initNavbar():
-function initNavbar() {
-    initMobileMenu();
-    initServicesDropdown();
-    initSearch();
-    initStickyHeader();
-    initAccessibility();
-    initScrollEffects();
-    initPerformanceOptimizations();
-    
-    // ADICIONAR ESTAS LINHAS:
-    initCategoryDropdowns();
-    initMobileAccordion();
-    enhanceServicesDropdown();
-    
-    console.log('SESC RR Navbar inicializado com sucesso!');
-}

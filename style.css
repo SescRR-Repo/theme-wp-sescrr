@@ -1371,7 +1371,7 @@ div.aligncenter {
     z-index: 1008;
 }
 
-}
+
 
     /* Corrigir exibição do dropdown */
 .category-item .sub-menu {
@@ -1410,4 +1410,6 @@ div.aligncenter {
     background: #f8f9fa;
     color: var(--sesc-blue);
     padding-left: 20px;
+}
+
 }

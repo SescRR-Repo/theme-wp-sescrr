@@ -1,7 +1,7 @@
 <?php
 /**
  * Template do cabeçalho - SESC RR
- * Navbar estilo SESC TO
+ * Navbar estilo SESC TO - VERSÃO CORRIGIDA
  * 
  * @package SESC_RR
  * @since 1.0.0
@@ -12,6 +12,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 ?>
+
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>
 <head>
@@ -177,6 +178,7 @@ if (!defined('ABSPATH')) {
         <nav class="category-nav" role="navigation" aria-label="Menu de categorias">
             <div class="container">
                 <?php
+                // USAR MENU PERSONALIZADO SE EXISTIR, SENÃO USAR FALLBACK
                 if (has_nav_menu('category_menu')) {
                     wp_nav_menu(array(
                         'theme_location' => 'category_menu',
@@ -184,11 +186,103 @@ if (!defined('ABSPATH')) {
                         'container'      => false,
                         'depth'          => 2,
                         'walker'         => new SESC_Category_Walker(),
-                        'fallback_cb'    => 'sesc_fallback_menu',
-                        'items_wrap'     => '<ul id="%1$s" class="%2$s">%3$s</ul>', // força estrutura correta
+                        'fallback_cb'    => false,
                     ));
                 } else {
-                    sesc_fallback_menu();
+                    // FALLBACK COM DROPDOWN FUNCIONAL
+                    ?>
+                    <ul class="category-menu">
+                        <li class="category-item menu-item-has-children cat-educacao" style="background-color: #9b59b6;">
+                            <a href="<?php echo esc_url(home_url('/educacao')); ?>">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                    <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/>
+                                </svg>
+                                <span>EDUCAÇÃO</span>
+                            </a>
+                            <ul class="sub-menu">
+                                <li><a href="<?php echo esc_url(home_url('/educacao/cursos')); ?>">Cursos</a></li>
+                                <li><a href="<?php echo esc_url(home_url('/educacao/oficinas')); ?>">Oficinas</a></li>
+                                <li><a href="<?php echo esc_url(home_url('/educacao/palestras')); ?>">Palestras</a></li>
+                                <li><a href="<?php echo esc_url(home_url('/educacao/ead')); ?>">Ensino à Distância</a></li>
+                            </ul>
+                        </li>
+                        
+                        <li class="category-item menu-item-has-children cat-esporte" style="background-color: #f39c12;">
+                            <a href="<?php echo esc_url(home_url('/esporte')); ?>">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                </svg>
+                                <span>ESPORTE</span>
+                            </a>
+                            <ul class="sub-menu">
+                                <li><a href="<?php echo esc_url(home_url('/esporte/academia')); ?>">Academia</a></li>
+                                <li><a href="<?php echo esc_url(home_url('/esporte/piscina')); ?>">Piscina</a></li>
+                                <li><a href="<?php echo esc_url(home_url('/esporte/quadras')); ?>">Quadras</a></li>
+                                <li><a href="<?php echo esc_url(home_url('/esporte/atividades')); ?>">Atividades Esportivas</a></li>
+                            </ul>
+                        </li>
+                        
+                        <li class="category-item menu-item-has-children cat-saude" style="background-color: #27ae60;">
+                            <a href="<?php echo esc_url(home_url('/saude')); ?>">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                    <path d="M19 8h-2v3h-3v2h3v3h2v-3h3v-2h-3V8zM4 8h2v8H4V8zm0-2h2V4H4v2zm14 0h2V4h-2v2z"/>
+                                </svg>
+                                <span>SAÚDE</span>
+                            </a>
+                            <ul class="sub-menu">
+                                <li><a href="<?php echo esc_url(home_url('/saude/consultas')); ?>">Consultas</a></li>
+                                <li><a href="<?php echo esc_url(home_url('/saude/odontologia')); ?>">Odontologia</a></li>
+                                <li><a href="<?php echo esc_url(home_url('/saude/nutricao')); ?>">Nutrição</a></li>
+                                <li><a href="<?php echo esc_url(home_url('/saude/prevencao')); ?>">Prevenção</a></li>
+                            </ul>
+                        </li>
+                        
+                        <li class="category-item menu-item-has-children cat-cultura" style="background-color: #e74c3c;">
+                            <a href="<?php echo esc_url(home_url('/cultura')); ?>">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                </svg>
+                                <span>CULTURA</span>
+                            </a>
+                            <ul class="sub-menu">
+                                <li><a href="<?php echo esc_url(home_url('/cultura/exposicoes')); ?>">Exposições</a></li>
+                                <li><a href="<?php echo esc_url(home_url('/cultura/teatro')); ?>">Teatro</a></li>
+                                <li><a href="<?php echo esc_url(home_url('/cultura/musica')); ?>">Música</a></li>
+                                <li><a href="<?php echo esc_url(home_url('/cultura/biblioteca')); ?>">Biblioteca</a></li>
+                            </ul>
+                        </li>
+                        
+                        <li class="category-item menu-item-has-children cat-assistencia" style="background-color: #8e44ad;">
+                            <a href="<?php echo esc_url(home_url('/assistencia')); ?>">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                </svg>
+                                <span>ASSISTÊNCIA</span>
+                            </a>
+                            <ul class="sub-menu">
+                                <li><a href="<?php echo esc_url(home_url('/assistencia/social')); ?>">Assistência Social</a></li>
+                                <li><a href="<?php echo esc_url(home_url('/assistencia/juridica')); ?>">Assessoria Jurídica</a></li>
+                                <li><a href="<?php echo esc_url(home_url('/assistencia/emergencia')); ?>">Atendimento Emergencial</a></li>
+                                <li><a href="<?php echo esc_url(home_url('/assistencia/orientacao')); ?>">Orientação</a></li>
+                            </ul>
+                        </li>
+                        
+                        <li class="category-item menu-item-has-children cat-turismo" style="background-color: #2ecc71;">
+                            <a href="<?php echo esc_url(home_url('/turismo')); ?>">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                    <path d="M14 6V4h-4v2h4zM4 8v11h16V8H4zm16-2c1.11 0 2 .89 2 2v11c0 1.11-.89 2-2 2H4c-1.11 0-2-.89-2-2l.01-11c0-1.11.89-2 2-2h4l2-2h4l2 2h4z"/>
+                                </svg>
+                                <span>TURISMO</span>
+                            </a>
+                            <ul class="sub-menu">
+                                <li><a href="<?php echo esc_url(home_url('/turismo/hoteis')); ?>">Hotéis SESC</a></li>
+                                <li><a href="<?php echo esc_url(home_url('/turismo/pacotes')); ?>">Pacotes</a></li>
+                                <li><a href="<?php echo esc_url(home_url('/turismo/excursoes')); ?>">Excursões</a></li>
+                                <li><a href="<?php echo esc_url(home_url('/turismo/reservas')); ?>">Reservas</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <?php
                 }
                 ?>
             </div>
@@ -232,56 +326,54 @@ if (!defined('ABSPATH')) {
             </form>
         </div>
         
-        <!-- SUBSTITUIR a seção do menu mobile no header.php por: -->
-
-<nav class="mobile-nav" role="navigation" aria-label="Menu mobile">
-    <?php
-    // Menu mobile usando o mesmo menu de categorias
-    if (has_nav_menu('category_menu')) {
-        wp_nav_menu(array(
-            'theme_location' => 'category_menu',
-            'menu_class'     => 'mobile-category-list',
-            'container'      => false,
-            'depth'          => 2,
-            'walker'         => new SESC_Category_Walker(),
-            'fallback_cb'    => false
-        ));
-    } else {
-        // Fallback manual se não houver menu configurado
-        ?>
-        <ul class="mobile-category-list">
-            <li class="menu-item-has-children">
-                <a href="<?php echo esc_url(home_url('/educacao')); ?>">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3z"/>
-                    </svg>
-                    EDUCAÇÃO
-                </a>
-                <ul class="sub-menu">
-                    <li><a href="<?php echo esc_url(home_url('/educacao/cursos')); ?>">Cursos</a></li>
-                    <li><a href="<?php echo esc_url(home_url('/educacao/oficinas')); ?>">Oficinas</a></li>
-                    <li><a href="<?php echo esc_url(home_url('/educacao/palestras')); ?>">Palestras</a></li>
+        <nav class="mobile-nav" role="navigation" aria-label="Menu mobile">
+            <?php
+            // Menu mobile usando o mesmo menu de categorias
+            if (has_nav_menu('category_menu')) {
+                wp_nav_menu(array(
+                    'theme_location' => 'category_menu',
+                    'menu_class'     => 'mobile-category-list',
+                    'container'      => false,
+                    'depth'          => 2,
+                    'walker'         => new SESC_Category_Walker(),
+                    'fallback_cb'    => false
+                ));
+            } else {
+                // Fallback manual se não houver menu configurado
+                ?>
+                <ul class="mobile-category-list">
+                    <li class="menu-item-has-children">
+                        <a href="<?php echo esc_url(home_url('/educacao')); ?>">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3z"/>
+                            </svg>
+                            EDUCAÇÃO
+                        </a>
+                        <ul class="sub-menu">
+                            <li><a href="<?php echo esc_url(home_url('/educacao/cursos')); ?>">Cursos</a></li>
+                            <li><a href="<?php echo esc_url(home_url('/educacao/oficinas')); ?>">Oficinas</a></li>
+                            <li><a href="<?php echo esc_url(home_url('/educacao/palestras')); ?>">Palestras</a></li>
+                        </ul>
+                    </li>
+                    <li class="menu-item-has-children">
+                        <a href="<?php echo esc_url(home_url('/esporte')); ?>">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+                            </svg>
+                            ESPORTE
+                        </a>
+                        <ul class="sub-menu">
+                            <li><a href="<?php echo esc_url(home_url('/esporte/academia')); ?>">Academia</a></li>
+                            <li><a href="<?php echo esc_url(home_url('/esporte/piscina')); ?>">Piscina</a></li>
+                            <li><a href="<?php echo esc_url(home_url('/esporte/quadras')); ?>">Quadras</a></li>
+                        </ul>
+                    </li>
+                    <!-- Outras categorias seguem o mesmo padrão -->
                 </ul>
-            </li>
-            <li class="menu-item-has-children">
-                <a href="<?php echo esc_url(home_url('/esporte')); ?>">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
-                    </svg>
-                    ESPORTE
-                </a>
-                <ul class="sub-menu">
-                    <li><a href="<?php echo esc_url(home_url('/esporte/academia')); ?>">Academia</a></li>
-                    <li><a href="<?php echo esc_url(home_url('/esporte/piscina')); ?>">Piscina</a></li>
-                    <li><a href="<?php echo esc_url(home_url('/esporte/quadras')); ?>">Quadras</a></li>
-                </ul>
-            </li>
-            <!-- Adicionar outras categorias conforme necessário -->
-        </ul>
-        <?php
-    }
-    ?>
-</nav>
+                <?php
+            }
+            ?>
+        </nav>
         
         <div class="mobile-user-area">
             <a href="<?php echo esc_url(get_theme_mod('sesc_login_url', home_url('/minha-conta'))); ?>" 
